@@ -82,6 +82,7 @@ export default async function RootLayout({
           docsRepositoryBase="https://github.com/bhavya-dang/my-wiki"
           footer={footer}
           editLink={null}
+          feedback={{ content: null }}
         >
           {children}
         </Layout>
