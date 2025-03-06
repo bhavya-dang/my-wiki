@@ -1,0 +1,199 @@
+# How to fetch data from the Anilist API (GraphQL) using Axios
+
+![alt text](https://miro.medium.com/v2/resize:fit:1100/format:webp/1*2MJx14l2aeoXGy4BLLl9kw.jpeg)
+
+Now I will not be going too much into what [**GraphQL**](https://graphql.org/) *is* exactly but what you should know is that it is a query language for your APIs that is fundamentally different from the good ol’ RESTful APIs. In GQL, we make a **post request** to our API rather than making different requests for different endpoints.
+
+For fetching different data, we can just make a post request to a single endpoint for the API specifying what data we need in the query that we pass in.
+
+`https://graphql.anilist.co`
+
+Since this is a going to be a very simple tutorial, I will be just fetching a small amount of data from the API, but you can add on to this and scale it up if you want to in your project.
+
+---
+
+Let’s first install **axios** and instantiate it in our code.
+
+```js
+const axios = require("axios");
+```
+
+Now let’s start building our query where we specify **what** and **how much** data we want.
+
+```js
+const query = `
+        query ($page: Int, $perPage: Int, $search: String) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo {
+      total
+      perPage
+    }
+    media(search: $search, type: ANIME, sort: FAVOURITES_DESC) {
+      id
+      title {
+        romaji
+        english
+        native
+      }
+      type
+      genres
+    }
+  }
+}
+`;
+```
+
+Now let’s break this down. `query` is the beginning of our query in which we have to initialize the variables that we want to use. By default, the API returns a single result object so if we want multiple results, we have to wrap our `media` query inside a `Page` query.
+
+The Page query also provides the `pageInfo` field which provides information about the current page and total results count.
+
+The `media` query is where the magic happens. Here we can just pass in the variable we passed in our `parent query` to get corresponding results filtered by that search string. In my example, I am just fetching the id, title, type and the genres of top 3 anime based on users rating and the search query (at the time of writing) but you can fetch different kinds of data and apply multiple types of sorting. This is the type of flexibility that GraphQL offers making it much easier to make API calls. You can check out the Anilist GraphQL Reference guide [here](https://anilist.github.io/ApiV2-GraphQL-Docs/)
+
+We can now pass in the values of the variables that we initialized in our query in a separate `variables` object. Here, I am just getting a single page of result with only 3 items.
+
+```js
+let variables = {
+  search: query,
+  page: 1,
+  perPage: 3,
+};
+```
+
+The main part of our code is done. Now we can combine all these blocks of code with our axios api call inside an async function and we will be done.
+
+```js
+ async function getAnime(query) {
+   // I used this query in my AniKo project as well which you can check out here: https://github.com/Sync-Codes/AniKo
+      const query = `
+        query ($page: Int, $perPage: Int, $search: String) {
+          Page(page: $page, perPage: $perPage) {
+            pageInfo {
+              total
+              currentPage
+              lastPage
+              hasNextPage
+              perPage
+            }
+            media(search: $search, sort: POPULARITY_DESC) {
+              id
+              title {
+                romaji
+                english
+                native
+              }
+              type
+              endDate {
+                year
+                month
+                day
+              }
+              startDate {
+                year
+                month
+                day
+              }
+              genres
+              volumes
+              episodes
+              chapters
+              description
+            }
+          }
+}`;
+
+      let variables = {
+        search: query,
+        page: 1,
+        perPage: 100,
+      };
+
+      const headers = {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+
+      const result = await axios({
+        method: 'post',
+        query,
+        variables,
+        headers
+      }).catch((err) => console.log(err.message));
+
+      console.log(result.data.data.Page.media); // this returns an array of the the results that corresponds to the options we passed in
+```
+
+This is how the result data will look like if I searched for “shingeki”.
+
+```json
+{
+  "data": {
+    "Page": {
+      "pageInfo": {
+        "total": 57,
+        "perPage": 5
+      },
+      "media": [
+        {
+          "id": 16498,
+          "title": {
+            "romaji": "Shingeki no Kyojin",
+            "english": "Attack on Titan",
+            "native": "進撃の巨人"
+          },
+          "type": "ANIME",
+          "genres": ["Action", "Drama", "Fantasy", "Mystery"]
+        },
+        {
+          "id": 110277,
+          "title": {
+            "romaji": "Shingeki no Kyojin: The Final Season",
+            "english": "Attack on Titan Final Season",
+            "native": "進撃の巨人 The Final Season"
+          },
+          "type": "ANIME",
+          "genres": ["Action", "Drama", "Fantasy", "Mystery"]
+        },
+        {
+          "id": 104578,
+          "title": {
+            "romaji": "Shingeki no Kyojin 3 Part 2",
+            "english": "Attack on Titan Season 3 Part 2",
+            "native": "進撃の巨人 3 Part.2"
+          },
+          "type": "ANIME",
+          "genres": ["Action", "Drama", "Fantasy", "Mystery"]
+        },
+        {
+          "id": 30,
+          "title": {
+            "romaji": "Shin Seiki Evangelion",
+            "english": "Neon Genesis Evangelion",
+            "native": "新世紀エヴァンゲリオン"
+          },
+          "type": "ANIME",
+          "genres": [
+            "Action",
+            "Drama",
+            "Mecha",
+            "Mystery",
+            "Psychological",
+            "Sci-Fi"
+          ]
+        },
+        {
+          "id": 99147,
+          "title": {
+            "romaji": "Shingeki no Kyojin 3",
+            "english": "Attack on Titan Season 3",
+            "native": "進撃の巨人 3"
+          },
+          "type": "ANIME",
+          "genres": ["Action", "Drama", "Fantasy", "Mystery"]
+        }
+      ]
+    }
+  }
+}
+```
+
+That’s… pretty much it. Now you know how to get data of your favorite anime with just a few lines of code. I also use this in my own project: [AniKo](https://ani-ko.netlify.app/).
