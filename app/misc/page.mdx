@@ -1,0 +1,25 @@
+# Miscellaneous
+
+## Scaffold a Playwright test
+
+```json showLineNumbers {5-10} /Playwright Test Scaffold/ copy
+{
+  "Playwright Test Scaffold": {
+    "scope": "javascript,typescript",
+    "prefix": ["pwtest", "playwright-test", "playwright"],
+    "body": [
+      "const { test, expect } = require('@playwright/test');\n",
+      "test('${1:title}', async ({ page }) => {",
+      "\u0009await page.goto('${2:url}')",
+      "});"
+    ],
+    "description": "Scaffold a playwright test"
+  }
+}
+```
+
+## My Tasks
+
+- [x] Record video
+- [ ] Edit the recording
+- [ ] Publish to youtube

@@ -1,0 +1,167 @@
+# Docker
+
+## Introduction
+
+Docker is a platform for developing, shipping, and running applications inside lightweight, portable containers. It enables developers to package applications with all dependencies and run them in any environment.
+
+## Installation
+
+### Windows
+
+1. Download Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop/).
+2. Run the installer and follow the on-screen instructions.
+3. Restart your system if necessary.
+
+### Linux (Debian-based)
+
+```sh
+sudo apt update
+sudo apt install -y docker.io
+sudo systemctl enable --now docker
+```
+
+### macOS
+
+1. Download and install Docker Desktop from [Docker's official website](https://www.docker.com/products/docker-desktop/).
+2. Follow the installation instructions.
+
+## Basic Commands
+
+### Check Docker Version
+
+```sh
+docker --version
+```
+
+### Running a Container
+
+```sh
+docker run -d -p 80:80 nginx
+```
+
+### Listing Running Containers
+
+```sh
+docker ps
+```
+
+### Stopping a Container
+
+```sh
+docker stop <container_id>
+```
+
+### Removing a Container
+
+```sh
+docker rm <container_id>
+```
+
+### Listing Images
+
+```sh
+docker images
+```
+
+### Removing an Image
+
+```sh
+docker rmi <image_id>
+```
+
+## Dockerfile
+
+A `Dockerfile` is a script containing a series of instructions on how to build a Docker image.
+
+### Example `Dockerfile`
+
+```dockerfile filename="Dockerfile"
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+CMD ["npm", "start"]
+```
+
+### Building an Image
+
+```sh
+docker build -t myapp .
+```
+
+### Running a Container from an Image
+
+```sh
+docker run -p 3000:3000 myapp
+```
+
+## Docker Compose
+
+Docker Compose allows managing multi-container applications using a YAML file.
+
+### Example `docker-compose.yml`
+
+```yaml
+version: "3"
+services:
+  web:
+    image: nginx
+    ports:
+      - "80:80"
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: example
+```
+
+### Running Docker Compose
+
+```sh
+docker-compose up -d
+```
+
+### Stopping Docker Compose
+
+```sh
+docker-compose down
+```
+
+## Networking in Docker
+
+### Listing Networks
+
+```sh
+docker network ls
+```
+
+### Creating a Network
+
+```sh
+docker network create mynetwork
+```
+
+### Connecting a Container to a Network
+
+```sh
+docker network connect mynetwork mycontainer
+```
+
+## Volumes in Docker
+
+### Creating a Volume
+
+```sh
+docker volume create myvolume
+```
+
+### Listing Volumes
+
+```sh
+docker volume ls
+```
+
+### Using a Volume in a Container
+
+```sh
+docker run -v myvolume:/data busybox
+```

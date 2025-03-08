@@ -1,5 +1,5 @@
 import { Footer, Layout, Navbar } from "nextra-theme-docs";
-import { Head } from "nextra/components";
+import { Banner, Head, Search } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import "nextra-theme-docs/style.css";
 import { LinkedInLogoIcon } from "@radix-ui/react-icons";
@@ -55,6 +55,14 @@ const navbar = (
   />
 );
 const footer = <Footer>MIT {new Date().getFullYear()} © Bhavya Dang.</Footer>;
+const banner = (
+  <Banner storageKey="1.0-release">
+    <a href="https://wiki.bhavyadang.in" target="_blank">
+      🎉 Wiki 1.0.0 is finally here!.
+    </a>
+  </Banner>
+);
+const search = <Search placeholder="Search wiki.."></Search>;
 
 export default async function RootLayout({
   children,
@@ -77,12 +85,14 @@ export default async function RootLayout({
       </Head>
       <body>
         <Layout
+          banner={banner}
           navbar={navbar}
           pageMap={await getPageMap()}
           docsRepositoryBase="https://github.com/bhavya-dang/my-wiki"
           footer={footer}
           editLink={null}
           feedback={{ content: null }}
+          search={search}
         >
           {children}
         </Layout>
