@@ -10,6 +10,6 @@ export default {
   "###": {
     type: "separator",
   },
-  blogs: "",
+  blogs: "Blogs",
   "how-to": "How To",
 };
