@@ -2,7 +2,6 @@
 export default {
   resources: "Resources",
   tools: "Tools",
-  misc: "Miscellaneous",
   "###": {
     type: "separator",
   },
