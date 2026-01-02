@@ -5,6 +5,8 @@ export default {
   "###": {
     type: "separator",
   },
+  golang: "Golang",
+  makefile: "Makefile",
   docker: "Docker",
   "###": {
     type: "separator",

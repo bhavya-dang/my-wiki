@@ -1,0 +1,61 @@
+# Makefile
+
+Makefile is a file that contains a set of instructions for the Makefile command.
+
+## Basic Commands
+
+### Check Makefile Version
+
+```sh
+make --version
+```
+
+### Create a Makefile
+
+```sh
+makefile
+```
+
+### Run a Makefile
+
+```sh
+make
+```
+
+### List Makefile Targets
+
+```sh
+make list
+```
+
+### Run a Makefile Target
+
+```sh
+make <target>
+```
+
+### Run a Makefile Target with a Variable and a Value
+
+```sh
+make <target> <variable>=<value>
+```
+
+## Makefile of a Go Application
+
+```makefile
+build:
+	go build -o main main.go
+
+run:
+	./main
+```
+
+> if you want to hide the build output, you can use the `@` symbol.
+
+```makefile
+build:
+	@go build -o main main.go
+
+run:
+	@./main
+```

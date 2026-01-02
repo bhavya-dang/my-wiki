@@ -1,0 +1,107 @@
+# Go Slices
+
+Slices are a type of array that can be resized.
+
+```go
+var name string
+```
+
+## Dynamic Variable Declaration
+
+```go
+name := "John"
+```
+
+## Creating a Slice
+
+```go
+slice := []int{1, 2, 3}
+```
+
+## Creating a Slice with a Capacity
+
+```go
+slice := make([]int, 0, 10)
+```
+
+## Adding Elements to a Slice
+
+```go
+slice = append(slice, 4)
+```
+
+## Removing Elements from a Slice
+
+```go
+slice = slice[:len(slice)-1]
+```
+
+## Getting the Length of a Slice
+
+Length is the number of elements in the slice.
+
+```go
+len(slice)
+```
+
+## Getting the Capacity of a Slice
+
+Capacity is the maximum number of elements that the slice can hold.
+
+```go
+cap(slice)
+```
+
+If we append an element to a slice that exceeds the capacity, the slice will be resized to double the current capacity.
+
+```go
+slice = append(slice, 4)
+```
+
+## Resizing a Slice
+
+```go
+slice = slice[:len(slice)+1]
+```
+
+## Concatenating Slices
+
+```go
+slice = slice[:len(slice)+1]
+```
+
+## Iterating over a Slice
+
+```go
+for _, value := range slice {
+    fmt.Println(value)
+}
+```
+
+## Sorting a Slice
+
+```go
+sort.Slice(slice, func(i, j int) bool {
+    return slice[i] < slice[j]
+})
+```
+
+## Finding the Index of an Element in a Slice
+
+```go
+index := sort.Search(len(slice), func(i int) bool {
+    return slice[i] == element
+})
+```
+
+## Removing an Element from a Slice
+
+```go
+slice = append(slice[:index], slice[index+1:]...)
+```
+
+## Removing an Element from a Slice by Value
+
+```go
+slice = append(slice[:index], slice[index+1:]...)
+```
