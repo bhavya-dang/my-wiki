@@ -5,6 +5,7 @@ import "nextra-theme-docs/style.css";
 import { LinkedInLogoIcon } from "@radix-ui/react-icons";
 import { Metadata } from "next";
 import Image from "next/image";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: {
@@ -96,6 +97,7 @@ export default async function RootLayout({
         >
           {children}
         </Layout>
+        <Analytics />
       </body>
     </html>
   );
