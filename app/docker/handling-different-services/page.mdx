@@ -1,0 +1,196 @@
+# Handling different services in one compose file
+
+Example: `docker-compose.yml` with ollama and n8n services
+
+```yaml
+version: "3.8"
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    platform: linux/arm64
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_MAX_LOADED_MODELS=2
+    restart: unless-stopped
+    networks:
+      - ai-network
+
+  n8n:
+    image: n8nio/n8n:latest
+    platform: linux/arm64
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=http://localhost:5678/
+    volumes:
+      - n8n_data:/home/node/.n8n
+    depends_on:
+      - ollama
+    networks:
+      - ai-network
+
+volumes:
+  ollama_data:
+    driver: local
+  n8n_data:
+    driver: local
+
+networks:
+  ai-network:
+    driver: bridge
+```
+
+### Start only Ollama
+
+```bash
+docker-compose up -d ollama
+```
+
+### Start only n8n
+
+```bash
+docker-compose up -d n8n
+```
+
+> Note: This will also start Ollama because of `depends_on`. To prevent this, remove the `depends_on` section.
+
+### Start Both Services
+
+```bash
+docker-compose up -d
+# or explicitly
+docker-compose up -d ollama n8n
+```
+
+### Stop Specific Services
+
+```bash
+# Stop only Ollama
+docker-compose stop ollama
+
+# Stop only n8n
+docker-compose stop n8n
+
+# Stop and remove specific service
+docker-compose rm -sf ollama
+
+# Stop all
+docker-compose down
+```
+
+### View Logs for Specific Services
+
+```bash
+# Ollama logs only
+docker-compose logs -f ollama
+
+# n8n logs only
+docker-compose logs -f n8n
+
+# Both
+docker-compose logs -f ollama n8n
+```
+
+### Restart Specific Services
+
+```bash
+# Restart Ollama
+docker-compose restart ollama
+
+# Restart n8n
+docker-compose restart n8n
+```
+
+## Helper Script
+
+`manage.sh`
+
+```bash manage.sh
+#!/bin/bash
+
+case "$1" in
+  ollama)
+    echo "Starting Ollama..."
+    docker-compose up -d ollama
+    sleep 3
+    docker exec -it ollama ollama pull llama3.2:3b
+    docker exec -it ollama ollama pull llama3.1:8b
+    echo "✅ Ollama ready at http://localhost:11434"
+    ;;
+
+  n8n)
+    echo "Starting n8n..."
+    docker-compose up -d n8n
+    echo "✅ n8n ready at http://localhost:5678"
+    ;;
+
+  full|all)
+    echo "Starting full stack..."
+    docker-compose up -d
+    sleep 3
+    docker exec -it ollama ollama pull llama3.2:3b
+    docker exec -it ollama ollama pull llama3.1:8b
+    echo "✅ Ollama ready at http://localhost:11434"
+    echo "✅ n8n ready at http://localhost:5678"
+    ;;
+
+  stop)
+    echo "Stopping services..."
+    docker-compose down
+    echo "✅ All services stopped"
+    ;;
+
+  logs)
+    if [ -z "$2" ]; then
+      docker-compose logs -f
+    else
+      docker-compose logs -f $2
+    fi
+    ;;
+
+  status)
+    docker-compose ps
+    ;;
+
+  *)
+    echo "Usage: $0 {ollama|n8n|full|stop|logs [service]|status}"
+    echo ""
+    echo "Examples:"
+    echo "  $0 ollama          # Start only Ollama"
+    echo "  $0 n8n             # Start only n8n"
+    echo "  $0 full            # Start everything"
+    echo "  $0 stop            # Stop all services"
+    echo "  $0 logs ollama     # View Ollama logs"
+    echo "  $0 status          # Check service status"
+    exit 1
+    ;;
+esac
+```
+
+### Make it executable
+
+```bash
+chmod +x manage.sh
+```
+
+### Usage
+
+```bash
+./manage.sh ollama    # Start only Ollama
+./manage.sh n8n       # Start only n8n
+./manage.sh full      # Start everything
+./manage.sh stop      # Stop all
+./manage.sh logs ollama  # View logs
+./manage.sh status    # Check status
+```
